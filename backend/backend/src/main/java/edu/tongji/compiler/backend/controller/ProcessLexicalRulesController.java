@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 public class ProcessLexicalRulesController {
 
@@ -13,7 +15,9 @@ public class ProcessLexicalRulesController {
     private ProcessLexicalRulesService processLexicalRulesService;
 
     @PostMapping("/process/lexical/rules/")
-    public String processLexicalRules(@RequestParam String lexicalRules) {
-        return processLexicalRulesService.processLexicalRules(lexicalRules);
+    public String processLexicalRules(@RequestParam Map<String, String> data) {
+        String lexicalRules = data.get("lexicalRules");
+        String sourceCode = data.get("sourceCode");
+        return processLexicalRulesService.processLexicalRules(lexicalRules, sourceCode);
     }
 }
