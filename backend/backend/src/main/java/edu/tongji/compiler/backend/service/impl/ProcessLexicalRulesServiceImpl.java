@@ -19,8 +19,8 @@ public class ProcessLexicalRulesServiceImpl implements ProcessLexicalRulesServic
         // 3. 生成词法分析器
         Lexer lexer = new Lexer(dfa, sourceCode);
         List<Token> tokens = lexer.tokenize();
-        System.out.println(tokens);
-        return "生成成功";
+        //System.out.println(tokens);
+        return lexer.getErrorMessage();
     }
 
     private List<LexicalRule> parseLexicalRules(String rules) {

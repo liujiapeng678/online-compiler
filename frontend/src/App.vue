@@ -38,7 +38,7 @@
     color="info"
     rounded="pill"
     >
-    提交成功
+    {{errorMsg}}
   </v-snackbar>
 </template>
 
@@ -46,6 +46,7 @@
 import {ref} from 'vue'
 import $ from 'jquery'
 
+const errorMsg = ref("")
 const sourceCode = ref("")
 const lexicalRules = ref("")
 const grammarRules = ref("")
@@ -59,10 +60,11 @@ const submitSourceCodeAndLexicalRules  = () => {
       lexicalRules: lexicalRules.value,
       sourceCode: sourceCode.value
     },
-    success(){
+    success(resp){
+      errorMsg.value = resp
       showSnackbar.value = true
     },
-    
+
   })
 }
 
