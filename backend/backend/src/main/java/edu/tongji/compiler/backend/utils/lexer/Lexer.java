@@ -76,11 +76,11 @@ public class Lexer {
                 currentContent.append(c);
                 nextState = getNextState(currentContent);
                 c = getNextChar();
-                System.out.println('#');
-                System.out.println(c);
-                System.out.println(row);
-                System.out.println(col);
-                System.out.println('#');
+//                System.out.println('#');
+//                System.out.println(c);
+//                System.out.println(row);
+//                System.out.println(col);
+//                System.out.println('#');
                 nextContent.append(c);
             }
             index--;
