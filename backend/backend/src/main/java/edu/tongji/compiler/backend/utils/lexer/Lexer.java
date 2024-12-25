@@ -38,8 +38,10 @@ public class Lexer {
     private char getNextChar(){
         if(index >= code.length()){
             index++;
-            return '\n';
+            //System.out.println(index);
+            return '\0';
         }
+        //System.out.println(index);
         char c = code.charAt(index++);
         col++;
         if(c == '\n'){
@@ -89,6 +91,15 @@ public class Lexer {
                 row--;
             }
             if(nextState == null){
+                if(flag){
+                    if(c == '\0'){
+                        break;
+                    }
+                } else {
+                    if(c1 == '\0'){
+                        break;
+                    }
+                }
                 errorMessage.setLength(0);
                 errorMessage.append("非法字符 '");
                 if(flag){
@@ -113,5 +124,8 @@ public class Lexer {
     }
     public String getErrorMessage() {
         return errorMessage.toString();
+    }
+    public List<Token> getTokens() {
+        return tokens;
     }
 }

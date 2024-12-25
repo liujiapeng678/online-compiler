@@ -2,6 +2,7 @@ package edu.tongji.compiler.backend.service.impl;
 
 import edu.tongji.compiler.backend.service.ProcessLexicalRulesService;
 import edu.tongji.compiler.backend.utils.lexer.*;
+import edu.tongji.compiler.backend.utils.parser.Parser;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -18,8 +19,9 @@ public class ProcessLexicalRulesServiceImpl implements ProcessLexicalRulesServic
         DFA dfa = generateDFA(rules);
         // 3. 生成词法分析器
         Lexer lexer = new Lexer(dfa, sourceCode);
+        Parser.setLexer(lexer);
         List<Token> tokens = lexer.tokenize();
-        //System.out.println(tokens);
+        System.out.println(tokens);
         return lexer.getErrorMessage();
     }
 
@@ -29,7 +31,7 @@ public class ProcessLexicalRulesServiceImpl implements ProcessLexicalRulesServic
 
         for (String line : lines) {
             line = line.trim();
-            // 解析规则定义，格式：tokenName: pattern
+            // 解析规则定义，格式：tokenName-> pattern
             String[] parts = line.split("->");
             String tokenName = parts[0].replaceAll("\\s+", "");
             String pattern = parts[1].replaceAll("\\s+", "");

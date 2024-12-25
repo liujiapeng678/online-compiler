@@ -64,12 +64,21 @@ const submitSourceCodeAndLexicalRules  = () => {
       errorMsg.value = resp
       showSnackbar.value = true
     },
-
   })
 }
 
 const submitGrammarRules = () => {
- console.log(grammarRules.value)
+  $.ajax({
+    url: 'http://localhost:3005/process/grammar/rules/',
+    type: 'post',
+    data: {
+      grammarRules: grammarRules.value,
+    },
+    success(resp){
+      errorMsg.value = resp
+      showSnackbar.value = true
+    },
+  })
 }
 </script>
 
