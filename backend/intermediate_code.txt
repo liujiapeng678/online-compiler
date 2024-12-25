@@ -1,0 +1,36 @@
+t0 = b * a
+t1 = t0 * b
+t2 = a + t1
+t3 = t2 + b
+x = t3
+y = 2
+L4:
+t6 = a + 1
+t7 = y - t6
+t8 = t7 + 1
+t9 = x + 1
+t10 = t9 * y
+t11 = t10 * x
+t12 = t8 < t11
+if not t12 goto L5
+t13 = x + 1
+t14 = t13 * y
+t15 = t14 / x
+x = t15
+goto L4
+L5:
+t16 = a + 1
+t17 = y - t16
+t18 = t17 + 1
+t19 = x + 1
+t20 = t19 * y
+t21 = t20 * x
+t22 = t18 > t21
+if t22 goto L23
+L23:
+t24 = a + 1
+t25 = y - t24
+t26 = t25 + 1
+y = t26
+t27 = y + x
+y = t27
