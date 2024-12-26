@@ -27,7 +27,6 @@ public class ProcessLexicalRulesServiceImpl implements ProcessLexicalRulesServic
     private List<LexicalRule> parseLexicalRules(String rules) {
         List<LexicalRule> lexicalRules = new ArrayList<>();
         String[] lines = rules.split("\n");
-
         for (String line : lines) {
             line = line.trim();
             // 解析规则定义，格式：tokenName: pattern
@@ -36,17 +35,14 @@ public class ProcessLexicalRulesServiceImpl implements ProcessLexicalRulesServic
             String pattern = parts[1].replaceAll("\\s+", "");
             lexicalRules.add(new LexicalRule(tokenName, pattern));
         }
-
         return lexicalRules;
     }
     private DFA generateDFA(List<LexicalRule> rules) {
         DFA dfa = new DFA();
         int stateId = 0;
-
         // 创建总的起始状态
         DFAState startState = new DFAState(stateId++);//0
         dfa.setStartState(startState);
-
         for(int i = 0; i < rules.size(); i++) {
             LexicalRule rule = rules.get(i);
             Pattern pattern = Pattern.compile(rule.getPattern());
@@ -58,7 +54,6 @@ public class ProcessLexicalRulesServiceImpl implements ProcessLexicalRulesServic
             dfa.getStates().add(dfaState);
             dfa.getAcceptingStates().add(dfaState);
         }
-
         return dfa;
     }
 }

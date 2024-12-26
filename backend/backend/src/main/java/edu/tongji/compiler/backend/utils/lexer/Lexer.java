@@ -12,6 +12,7 @@ public class Lexer {
     private final String code;
     private int index;                            //  读到什么位置
     private int col;                              //  读到什么位置
+    private int tempCol;
     private int row;                              //  读到什么位置
     private final StringBuilder errorMessage;
 
@@ -23,6 +24,7 @@ public class Lexer {
         this.index = 0;
         this.errorMessage = new StringBuilder("上传成功");
         this.col = 0;
+        this.tempCol = 0;
         this.row = 1;
     }
     private DFAState getNextState(StringBuilder content){
@@ -45,6 +47,7 @@ public class Lexer {
         //System.out.println(index);
         char c = code.charAt(index++);
         col++;
+        tempCol++;
         if(c == '\n'){
             row++;
             col = 0;
@@ -63,6 +66,7 @@ public class Lexer {
         StringBuilder nextContent = new StringBuilder();
         DFAState nextState = null;
 
+
         while(index < code.length()){
             //System.out.println(index);
             boolean flag = true;
@@ -79,6 +83,7 @@ public class Lexer {
             while(getNextState(nextContent) != null){
                 currentContent.append(c);
                 nextState = getNextState(currentContent);
+                if(col != 0)tempCol = col;
                 c = getNextChar();
 //                System.out.println('#');
 //                System.out.println(c);
@@ -89,6 +94,7 @@ public class Lexer {
             }
             index--;
             col--;
+            tempCol--;
             if(c == '\n'){
                 row--;
             }
@@ -113,12 +119,12 @@ public class Lexer {
                 errorMessage.append("at row ");
                 errorMessage.append(row);
                 errorMessage.append(" col ");
-                errorMessage.append(col);
+                errorMessage.append(tempCol);
                 errorMessage.append('.');
                 break;
             } else {
                 if(Objects.equals(nextState.getTokenName(), "Identifiers")){
-                    if(currentContent.toString().length() > 256){
+                    if(currentContent.toString().length() > 10){
                         errorMessage.setLength(0);
                         errorMessage.append("标识符过长 '");
                         errorMessage.append(currentContent);
@@ -126,7 +132,7 @@ public class Lexer {
                         errorMessage.append("at row ");
                         errorMessage.append(row);
                         errorMessage.append(" col ");
-                        errorMessage.append(col);
+                        errorMessage.append(col - currentContent.length() + 1);
                         errorMessage.append('.');
                         break;
                     }
@@ -139,13 +145,14 @@ public class Lexer {
                         errorMessage.append("at row ");
                         errorMessage.append(row);
                         errorMessage.append(" col ");
-                        errorMessage.append(col);
+                        errorMessage.append(col - currentContent.length() + 1);
                         errorMessage.append('.');
                         break;
                     }
                 }
             }
             tokens.add(new Token(nextState.getTokenName(), currentContent.toString()));
+            System.out.println(currentContent.toString() + ' ' + col);
             currentContent.setLength(0);
             nextContent.setLength(0);
         }

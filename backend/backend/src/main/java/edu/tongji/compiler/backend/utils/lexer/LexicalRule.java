@@ -4,8 +4,6 @@ public class LexicalRule {
     private String tokenName;        // token名称
     private String pattern;          // 正则表达式
 
-
-
     public String getTokenName() {
         return tokenName;
     }

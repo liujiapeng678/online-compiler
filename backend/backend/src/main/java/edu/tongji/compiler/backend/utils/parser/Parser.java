@@ -250,7 +250,7 @@ public class Parser {
 
     // 保存中间代码到文件
     private static void saveIntermediateCode() {
-        try (PrintWriter writer = new PrintWriter("intermediate_code.txt")) {
+        try (PrintWriter writer = new PrintWriter("three_address_code.txt")) {
             for (String code : intermediateCode) {
                 writer.println(code);
             }
