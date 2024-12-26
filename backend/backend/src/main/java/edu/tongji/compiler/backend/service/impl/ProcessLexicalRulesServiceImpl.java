@@ -2,7 +2,7 @@ package edu.tongji.compiler.backend.service.impl;
 
 import edu.tongji.compiler.backend.service.ProcessLexicalRulesService;
 import edu.tongji.compiler.backend.utils.lexer.*;
-import edu.tongji.compiler.backend.utils.Parser.*;
+import edu.tongji.compiler.backend.utils.parser.Parser;
 import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.regex.Pattern;

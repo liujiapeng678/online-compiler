@@ -1,4 +1,4 @@
-package edu.tongji.compiler.backend.utils.Parser;
+package edu.tongji.compiler.backend.utils.parser;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;

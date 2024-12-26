@@ -80,7 +80,6 @@ const submitGrammarRules = () => {
       errorMsg.value = resp
       showSnackbar.value = true
     },
-
   })
 }
 </script>

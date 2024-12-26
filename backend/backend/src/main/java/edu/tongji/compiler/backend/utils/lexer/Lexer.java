@@ -2,6 +2,7 @@ package edu.tongji.compiler.backend.utils.lexer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class Lexer {
@@ -67,6 +68,7 @@ public class Lexer {
             boolean flag = true;
             char c1 = getNextNotWhitespaceChar();
             currentContent.append(c1);
+            //System.out.println(c1);
             nextContent.append(c1);
             nextState = getNextState(currentContent);
             if(nextState == null){
@@ -114,6 +116,34 @@ public class Lexer {
                 errorMessage.append(col);
                 errorMessage.append('.');
                 break;
+            } else {
+                if(Objects.equals(nextState.getTokenName(), "Identifiers")){
+                    if(currentContent.toString().length() > 256){
+                        errorMessage.setLength(0);
+                        errorMessage.append("标识符过长 '");
+                        errorMessage.append(currentContent);
+                        errorMessage.append('\'');
+                        errorMessage.append("at row ");
+                        errorMessage.append(row);
+                        errorMessage.append(" col ");
+                        errorMessage.append(col);
+                        errorMessage.append('.');
+                        break;
+                    }
+                } else if(Objects.equals(nextState.getTokenName(), "Constants")){
+                    if(Integer.parseInt(currentContent.toString()) < -32768 || Integer.parseInt(currentContent.toString()) > 32767){
+                        errorMessage.setLength(0);
+                        errorMessage.append("整数过长 '");
+                        errorMessage.append(currentContent);
+                        errorMessage.append('\'');
+                        errorMessage.append("at row ");
+                        errorMessage.append(row);
+                        errorMessage.append(" col ");
+                        errorMessage.append(col);
+                        errorMessage.append('.');
+                        break;
+                    }
+                }
             }
             tokens.add(new Token(nextState.getTokenName(), currentContent.toString()));
             currentContent.setLength(0);
