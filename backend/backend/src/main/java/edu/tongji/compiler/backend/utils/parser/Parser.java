@@ -10,12 +10,23 @@ import java.util.Map;
 import edu.tongji.compiler.backend.utils.lexer.Lexer;
 import edu.tongji.compiler.backend.utils.lexer.Token;
 
+/**
+ * 编译器的语法分析器
+ * 负责将词法单元(Token)序列转换为中间代码
+ * 实现了一个简单的递归下降解析器
+ */
 public class Parser {
+    // 词法分析器实例
     private static Lexer lexer;
+    // 词法单元列表
     private static List<Token> tokens;
+    // 当前处理的词法单元索引
     private static int currentTokenIndex = 0;
+    // 存储生成的中间代码
     private static List<String> intermediateCode;
+    // 临时变量计数器，用于生成唯一的临时变量名
     private static int tempVarCounter = 0;
+    // 符号表，存储变量和常量的信息
     private static Map<String, String> symbolTable;
 
     public static Lexer setLexer(Lexer newLexer) {
@@ -53,13 +64,19 @@ public class Parser {
         intermediateCode.add(code);
     }
 
-    // 开始语法分析
+    /**
+     * 语法分析的入口方法
+     * 处理整个程序的语法结构并生成中间代码
+     */
     public static void parse() {
         program();
         saveIntermediateCode();
     }
 
-    // 处理程序
+    /**
+     * 处理程序的最顶层结构
+     * 期望的格式: PROGRAM <标识符> <程序块>
+     */
     private static void program() {
         if (getCurrentToken().getContent().equals("PROGRAM")) {
             advance();
@@ -70,7 +87,10 @@ public class Parser {
         }
     }
 
-    // 处理代码块
+    /**
+     * 处理代码块结构
+     * 包含常量声明、变量声明和语句部分
+     */
     private static void block() {
         // 处理常量声明
         if (getCurrentToken().getContent().equals("CONST")) {
@@ -88,7 +108,10 @@ public class Parser {
         statement();
     }
 
-    // 处理常量声明
+    /**
+     * 处理常量声明
+     * 格式: CONST <标识符>:=<常量>[,<标识符>:=<常量>]...;
+     */
     private static void constDeclaration() {
         do {
             if (getCurrentToken().getTokenName().equals("Identifiers")) {
@@ -109,7 +132,10 @@ public class Parser {
         advance();
     }
 
-    // 处理变量声明
+    /**
+     * 处理变量声明
+     * 格式: VAR <标识符>[,<标识符>]...;
+     */
     private static void varDeclaration() {
         do {
             if (getCurrentToken().getTokenName().equals("Identifiers")) {
@@ -123,7 +149,10 @@ public class Parser {
         advance();
     }
 
-    // 处理语句
+    /**
+     * 处理语句
+     * 包括复合语句(BEGIN...END)、IF语句、WHILE语句和赋值语句
+     */
     private static void statement() {
         Token currentToken = getCurrentToken();
         
@@ -145,7 +174,10 @@ public class Parser {
         }
     }
 
-    // 处理赋值语句
+    /**
+     * 处理赋值语句
+     * 格式: <标识符>:=<表达式>
+     */
     private static void handleAssignment() {
         String leftVar = getCurrentToken().getContent();
         advance(); // 跳过标识符
@@ -154,7 +186,11 @@ public class Parser {
         addIntermediateCode(leftVar + " = " + rightValue);
     }
 
-    // 处理表达式
+    /**
+     * 处理表达式
+     * 处理加法和减法运算
+     * @return 表达式的结果（可能是临时变量）
+     */
     private static String expression() {
         String term1 = term();
         while (getCurrentToken() != null && 
@@ -169,7 +205,11 @@ public class Parser {
         return term1;
     }
 
-    // 处理项
+    /**
+     * 处理项
+     * 处理乘法和除法运算
+     * @return 项的结果（可能是临时变量）
+     */
     private static String term() {
         String factor1 = factor();
         while (getCurrentToken() != null && 
@@ -184,7 +224,11 @@ public class Parser {
         return factor1;
     }
 
-    // 处理因子
+    /**
+     * 处理因子
+     * 可以是常量、变量或括号表达式
+     * @return 因子的值或对应的变量名
+     */
     private static String factor() {
         Token currentToken = getCurrentToken();
         String result;
@@ -200,26 +244,42 @@ public class Parser {
             result = expression();
             advance(); // 跳过)
         } else {
-            result = "";
+            throw new RuntimeException("语法错误：因子必须是常量、变量或括号表达式，当前token为: " + currentToken.getContent());
         }
         return result;
     }
 
-    // 处理IF语句
+    /**
+     * 处理IF语句
+     * 格式: IF <条件> THEN <语句>
+     */
     private static void handleIfStatement() {
         advance(); // 跳过IF
         String condition = condition();
-        String label = "L" + tempVarCounter++;
-        addIntermediateCode("if " + condition + " goto " + label);
+        String trueLabel = "L" + tempVarCounter++;
+        String endLabel = "L" + tempVarCounter++;
+        
+        addIntermediateCode("if " + condition + " goto " + trueLabel);
         
         if (getCurrentToken().getContent().equals("THEN")) {
             advance();
-            addIntermediateCode(label + ":");
+            addIntermediateCode(trueLabel + ":");
             statement();
+            
+            // 处理ELSE分支
+            if (getCurrentToken().getContent().equals("ELSE")) {
+                advance();
+                addIntermediateCode("goto " + endLabel);
+                statement();
+                addIntermediateCode(endLabel + ":");
+            }
         }
     }
 
-    // 处理WHILE语句
+    /**
+     * 处理WHILE语句
+     * 格式: WHILE <条件> DO <语句>
+     */
     private static void handleWhileStatement() {
         advance(); // 跳过WHILE
         String startLabel = "L" + tempVarCounter++;
@@ -237,7 +297,11 @@ public class Parser {
         }
     }
 
-    // 处理条件
+    /**
+     * 处理条件表达式
+     * 格式: <表达式> <关系运算符> <表达式>
+     * @return 条件判断的结果（临时变量）
+     */
     private static String condition() {
         String expr1 = expression();
         String operator = getCurrentToken().getContent();
@@ -248,9 +312,12 @@ public class Parser {
         return tempVar;
     }
 
-    // 保存中间代码到文件
+    /**
+     * 将生成的中间代码保存到文件
+     * 文件名为 intermediate_code.txt
+     */
     private static void saveIntermediateCode() {
-        try (PrintWriter writer = new PrintWriter("three_address_code.txt")) {
+        try (PrintWriter writer = new PrintWriter("intermediate_code.txt")) {
             for (String code : intermediateCode) {
                 writer.println(code);
             }
